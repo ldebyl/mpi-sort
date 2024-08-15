@@ -1,0 +1,67 @@
+#!/bin/bash
+
+#####################################################################
+# CITS5007 High Performance Computing
+# Assignment 2, October 2021
+#
+# Lee de Byl (10306807@student.uwa.edu.au
+#
+# Driver script to run the sort experiment with various parameters.
+#
+#####################################################################
+
+# Create the CSV file and header
+echo "mode,algorithm,processes,threads,n,cpu_time,wall_time,clocks_per_mega_n,seconds_per_mega_n" > ../results/results.csv
+
+# Run the MPI implementation
+for processes in 1 2 4 8
+do
+    for ((n=10000;n<=500000;n=n+10000));
+    do
+        for alg in QUICK MERGE
+        do
+            echo "Processes: $processes N: $n Algo: $alg"
+            mpirun -n $processes ./sort-mpi -t 0 -n $n -a $alg >> ../results/results.csv
+        done
+    done
+done
+
+# Run the parallel implementation - Enumeration Sort
+for processes in 1 2 4 8
+do
+    for threads in 1 2
+    do
+        for ((n=5000;n<=50000;n=n+5000));
+        do
+            for alg in ENUMERATION_OUTER
+            do
+                echo "Processes: $processes N: $n Algo: $alg"
+                mpirun -n $processes ./sort-mpi -t $threads -n $n -a $alg >> ../results/results.csv
+            done
+        done
+    done
+done
+
+echo "Running serial sorts..."
+
+# Run the serial implementation - number of threads is not
+# specified.
+# Note that in the serial version, ENUMERATION_INNER and ENUMERATION_OUTER
+# are identical, so only one needs to be run.
+for ((n=10000;n<=500000;n=n+10000));
+do
+    for alg in QUICK MERGE
+    do
+        echo "Threads: 0 (Serial) N: $n Algo: $alg"
+        ./sort-serial -n $n -a $alg >> ../results/results.csv
+    done
+done
+
+for ((n=5000;n<=50000;n=n+5000));
+do
+    for alg in ENUMERATION
+    do
+        echo "Threads: 0 (Serial) N: $n Algo: $alg"
+        ./sort-serial -n $n -a $alg >> ../results/results.csv
+    done
+done

@@ -1,0 +1,85 @@
+MPI Enumeration Sort
+
+within each process:
+  let n=number of elements
+  let r=process rank
+  let p=process count
+
+  # start element
+  let start=(n/p)*r
+  # end element
+  let end=(i+n/p)-1
+  if r == p-1:
+    end=end + n%p
+
+  let a=[array to be sorted]
+  let b=[output array]
+  let n=length(a)
+  for i in start..end:
+    in parallel:
+      let index=0
+      for j in 1..n:
+       if a[j]<a[i]:
+         increment index
+       or if a[i]=a[j] and j<i:
+         increment index
+    b[index]=a[i]
+  reduce b into a by sum
+
+From Rank 0:
+  return a
+
+Merge Sort
+
+Within each process:
+  // Get the rank of this
+  // process
+  r = my_rank()
+
+  // Get part of the array
+  // to work on
+  array=get_array_slice()
+
+  max_height = log2(n_processes)
+  height = 0
+  // Sort this chunk of the array
+  // using OMP
+  omp_mergesort(array)
+
+  while height < max_height:
+    pr = parent_rank()
+    if pr = r:
+      // This process is
+      // a parent
+      child = child_rank()
+      receive child array
+      merge(child_array, array)
+      increment height
+    else:
+      // This process is a
+      // child
+      send child array
+      exit
+
+Quicksort MPI
+proc mpi_quicksort:
+  For each process:
+    let array=array_chunk()
+    serial_quicksort(array)
+    r_quicksort(array)
+  gather results -> root
+
+proc r_quicksort(array):
+  if number of processes = 1:
+    // No more parallel work
+    return
+  let pvt_point = mean(array)
+  reduce by sum (pvt_point) ->
+    root[global_pivot]
+  broadcast [global_pivot] ->
+    all processes
+  let pvt_index = search(array,
+    global_pivot)
+  exchange halves with neighbour
+  split communicators
+  r_quicksort(array)

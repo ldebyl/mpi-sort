@@ -1,0 +1,86 @@
+.TH sort-serial 1 "October 22, 2021"
+.LO 1
+.SH NAME
+sort-serial \- experimental serial sort
+.SH SYNOPSIS
+.B sort-serial
+.RB [ \-n
+.IR array_size]
+.RB [ \-a
+.IR sort_method ]
+.RB [ \-v]
+.RB [ \-o]
+
+.SH DESCRIPTION
+.B sort-serial
+generates an array of random floating point numbers and sorts them using a
+variety of serialsorting algorithms. Enumeration Sort, Quicksort
+and Merge Sort have been implemented.
+
+.SH OPTIONS
+.TP
+.B \-a
+Specifies the sort algorithm. May be one of
+.BR ENUMERATION_INNER,
+which performs an enumeration sort,
+.BR ENUMERATION_OUTER
+which is functionally identical to ENUMERATION_INNER.
+.BR QUICK
+performs a Quicksort.
+.BR MERGE
+performs a merge sort.
+.TP
+.B \-v
+Enables verification of the sort results to ensure they are strictly ascending.
+Note that this runs in serial. If the verification fails, an error will be
+printed to
+.I stderr,
+and the program will return -1.
+.TP
+.B \-o
+Outputs the results of the sort to
+.I stdout.
+.TP
+.B \-n
+.I number
+Sets the number of random numbers to be generated. Memory will be dynamically
+.SH OUTPUT
+Outputs a string of statistics to
+.BR stdout
+with the following format:
+.TP
+.B MODE
+Whether the algorithm was run in serial or parallel mode.
+.TP
+.B ALGORITHM
+The name of the algorithm.
+.TP
+.B THREADS
+The number of threads the algorithm was executed with. 0 when executed in
+serial.
+.TP
+.B N
+The number of random numbers sorted.
+.TP
+.B CPU_TIME
+The amount of total CPU time consumed across all threads, in seconds.
+.TP
+.B WALL_TIME
+The elapsed wall-clock time.
+.TP
+.B CLOCKS_PER_MEGA_N
+The number of CPU clocks taken to sort 1M numbers. Lower is better.
+.TP
+.B SECONDS_PER_MEGA_N
+The number of realtime seconds taken to sort 1M numbers. Lower is better.
+.TP
+Errors and dianostic information are output to
+.BI stderr.
+.TP
+Returns 0 if validation succeeded or if validation is not enabled; returns -1 if
+validation failes and validation is enabled.
+
+.SH AUTHOR
+Lee de Byl, 10306807@student.uwa.edu.au
+.SH "SEE ALSO"
+mergesort(3), qsort(3)

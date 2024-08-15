@@ -1,0 +1,5 @@
+#include "sort.h"
+#include "quicksort-serial.h"
+#include "enumeration-serial.h"
+#include "random-serial.h"
+#include "mergesort-serial.h"
